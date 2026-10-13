@@ -24,9 +24,9 @@ console.log(latest.market_hash_name, latest.listings.length)
 ## API
 - Listings: `getListingsLatestAggregated`, `getListingsHistoryAggregated`
 - Sales: `getSalesLatestAggregated`, `getSalesHistoryAggregated`
-- Meta: `getItems`, `getMarkets`, `getCurrencyRates`, `getPlayerCountsLatest`, `getPlayerCountsHistory`
+- Meta: `getItems`, `getItemContents`, `getMarkets`, `getAccount`, `getPlayerCountsLatest`, `getPlayerCountsHistory`
 
-Enums: `Market`, `Currency`
+Enums: `Market`, `Currency`, `Phase`
 
 ## Requirements
 - Node 18+ (or Bun 1+) with global `fetch`

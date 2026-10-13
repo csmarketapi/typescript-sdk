@@ -20,8 +20,12 @@ describe('CSMarketAPI Tests', () => {
     await client!.getMarkets();
   });
 
-  test('getCurrencyRates', async () => {
-    await client!.getCurrencyRates();
+  test('getItemContents', async () => {
+    await client!.getItemContents({ marketHashName: 'Shadow Case' });
+  });
+
+  test('getAccount', async () => {
+    await client!.getAccount();
   });
 
   test('getPlayerCountsLatest', async () => {
