@@ -44,11 +44,11 @@ export const ListingsHistoryAggregatedModel = z.object({
 const SalesItemModel = z.object({
   id: z.number(),
   market: z.string(),
-  mean_price: z.number().nullable(),
-  min_price: z.number().nullable(),
-  max_price: z.number().nullable(),
-  median_price: z.number().nullable(),
-  volume: z.number().nullable(),
+  mean_price: z.number().nullable().optional(),
+  min_price: z.number().nullable().optional(),
+  max_price: z.number().nullable().optional(),
+  median_price: z.number().nullable().optional(),
+  volume: z.number().nullable().optional(),
   day: z.coerce.date()
 });
 
@@ -63,11 +63,11 @@ export const SalesHistoryAggregatedModel = z.object({
     sales: z.array(z.object({
       id: z.number(),
       market: z.string(),
-      mean_price: z.number().nullable(),
-      min_price: z.number().nullable(),
-      max_price: z.number().nullable(),
-      median_price: z.number().nullable(),
-      volume: z.number().nullable()
+      mean_price: z.number().nullable().optional(),
+      min_price: z.number().nullable().optional(),
+      max_price: z.number().nullable().optional(),
+      median_price: z.number().nullable().optional(),
+      volume: z.number().nullable().optional()
     }))
   }))
 });
