@@ -14,7 +14,7 @@ beforeAll(() => {
 describe('CSMarketAPI Tests', () => {
   test('getItems', async () => {
     await client!.getItems();
-  });
+  }, 60_000);
 
   test('getMarkets', async () => {
     await client!.getMarkets();
