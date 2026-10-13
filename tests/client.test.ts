@@ -14,14 +14,18 @@ beforeAll(() => {
 describe('CSMarketAPI Tests', () => {
   test('getItems', async () => {
     await client!.getItems();
-  });
+  }, 60_000);
 
   test('getMarkets', async () => {
     await client!.getMarkets();
   });
 
-  test('getCurrencyRates', async () => {
-    await client!.getCurrencyRates();
+  test('getItemContents', async () => {
+    await client!.getItemContents({ marketHashName: 'Shadow Case' });
+  });
+
+  test('getAccount', async () => {
+    await client!.getAccount();
   });
 
   test('getPlayerCountsLatest', async () => {

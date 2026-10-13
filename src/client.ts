@@ -1,6 +1,7 @@
-import { Currency, Market } from "./enums";
+import { Currency, Market, Phase } from "./enums";
 import type {
-    CurrencyRates,
+    Account,
+    ItemContents,
     Items,
     ListingsHistoryAggregated,
     ListingsLatestAggregated,
@@ -11,8 +12,9 @@ import type {
     SalesLatestAggregated
 } from "./models";
 import {
+    AccountModel,
+    ItemContentsModel,
     ItemsModel,
-    CurrencyRatesModel,
     PlayerCountsLatestModel,
     PlayerCountsHistoryModel,
     ListingsLatestAggregatedModel,
@@ -78,14 +80,14 @@ export class CSMarketAPI {
         marketHashName: string
         markets?: ReadonlyArray<Market>
         currency?: Currency
-        maxAge?: string | null
+        phase?: Phase | null
     }): Promise<ListingsLatestAggregated> {
-        const { marketHashName, markets, currency = Currency.USD, maxAge } = args
-        const result = await this.request<ListingsLatestAggregated>("/v1/listings/latest/aggregate", {
+        const { marketHashName, markets, currency = Currency.USD, phase } = args
+        const result = await this.request<ListingsLatestAggregated>("/v2/listings/latest/aggregate", {
             market_hash_name: marketHashName,
             markets,
             currency,
-            ...(maxAge ? { max_age: maxAge } : {})
+            ...(phase ? { phase } : {})
         })
         return ListingsLatestAggregatedModel.parse(result) 
     }
@@ -94,19 +96,20 @@ export class CSMarketAPI {
         marketHashName: string
         markets?: ReadonlyArray<Market>
         currency?: Currency
-        maxAge?: string | null
+        since?: string | Date | null
+        phase?: Phase | null
     }): Promise<ListingsHistoryAggregated> {
-        const { marketHashName, markets, currency = Currency.USD, maxAge } = args
-        const items = await this.request<ListingsHistoryAggregated["items"]>(
-            "/v1/listings/history/aggregate",
+        const { marketHashName, markets, currency = Currency.USD, since, phase } = args
+        const result = await this.request<ListingsHistoryAggregated>(
+            "/v2/listings/history/aggregate",
             {
                 market_hash_name: marketHashName,
                 markets,
                 currency,
-                ...(maxAge ? { max_age: maxAge } : {})
+                ...(since ? { since } : {}),
+                ...(phase ? { phase } : {})
             }
         )
-        const result = { items }
         return ListingsHistoryAggregatedModel.parse(result) 
     }
 
@@ -116,7 +119,7 @@ export class CSMarketAPI {
         currency?: Currency
     }): Promise<SalesLatestAggregated> {
         const { marketHashName, markets, currency = Currency.USD } = args
-        const result = await this.request<SalesLatestAggregated>("/v1/sales/latest/aggregate", {
+        const result = await this.request<SalesLatestAggregated>("/v2/sales/latest/aggregate", {
             market_hash_name: marketHashName,
             markets,
             currency
@@ -133,7 +136,7 @@ export class CSMarketAPI {
     }): Promise<SalesHistoryAggregated> {
         const { marketHashName, markets, start, end, currency = Currency.USD } = args
         const items = await this.request<SalesHistoryAggregated["items"]>(
-            "/v1/sales/history/aggregate",
+            "/v2/sales/history/aggregate",
             {
                 market_hash_name: marketHashName,
                 markets,
@@ -146,31 +149,42 @@ export class CSMarketAPI {
         return SalesHistoryAggregatedModel.parse(result) 
     }
 
-    async getItems(): Promise<Items> {
-        const items = await this.request<Items["items"]>("/v1/items")
+    async getItems(args?: { q?: string | null; unlisted?: boolean }): Promise<Items> {
+        const { q, unlisted = false } = args ?? {}
+        const items = await this.request<Items["items"]>("/v2/items/", {
+            ...(q != null ? { q } : {}),
+            unlisted
+        })
         const result = { items }
         return ItemsModel.parse(result) 
     }
 
+    async getItemContents(args: { marketHashName: string }): Promise<ItemContents> {
+        const { marketHashName } = args
+        const result = await this.request<ItemContents>("/v2/items/contents", {
+            market_hash_name: marketHashName
+        })
+        return ItemContentsModel.parse(result) 
+    }
+
     async getMarkets(): Promise<Markets> {
-        const result = await this.request<Markets>("/v1/markets")
+        const result = await this.request<Markets>("/v2/markets/")
         return MarketsModel.parse(result) 
     }
 
-    async getCurrencyRates(): Promise<CurrencyRates> {
-        const items = await this.request<CurrencyRates["items"]>("/v1/currency_rates")
-        const result = { items }
-        return CurrencyRatesModel.parse(result) 
+    async getAccount(): Promise<Account> {
+        const result = await this.request<Account>("/v2/account")
+        return AccountModel.parse(result) 
     }
 
     async getPlayerCountsLatest(): Promise<PlayerCountsLatest> {
-        const result = await this.request<PlayerCountsLatest>("/v1/player_counts/latest")
+        const result = await this.request<PlayerCountsLatest>("/v2/player_counts/latest")
         return PlayerCountsLatestModel.parse(result) 
     }
 
     async getPlayerCountsHistory(args?: { start?: string | Date | null; end?: string | Date | null }): Promise<PlayerCountsHistory> {
         const { start, end } = args ?? {}
-        const items = await this.request<PlayerCountsHistory["items"]>("/v1/player_counts/history", {
+        const items = await this.request<PlayerCountsHistory["items"]>("/v2/player_counts/history", {
             ...(start ? { start } : {}),
             ...(end ? { end } : {})
         })
@@ -179,6 +193,6 @@ export class CSMarketAPI {
     }
 }
 
-export { Market, Currency }
+export { Market, Currency, Phase }
 
 
